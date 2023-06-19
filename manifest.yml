@@ -1,6 +1,6 @@
 applications:
-- name: msgproducer
-  path: ./target/MultiDatabaseTest.war
+- name: msgconsumer
+  path: ./target/DecryptData.war
   memory: 1024m
   buildpack: java_buildpack
 
@@ -10,4 +10,4 @@ applications:
     HANA_WITH_APP_SCHEMA: 'hana-schema-1'
 
   services:
-    - credstore
+    - csproxy-test

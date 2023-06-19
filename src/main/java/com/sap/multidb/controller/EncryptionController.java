@@ -13,8 +13,8 @@ import com.sap.multidb.app.model.EncryptionData;
 import com.sap.security.dataencryption.DataEncryption;
 import com.sap.security.dataencryption.DataEncryptionException;
 import com.sap.security.dataencryption.DataEncryptionKeyProvider;
+import com.sap.security.dataencryption.DecryptDataResult;
 import com.sap.security.dataencryption.DefaultKeyCache;
-import com.sap.security.dataencryption.EncryptDataResult;
 import com.sap.security.dataencryption.KeyCache;
 import com.sap.security.dataencryption.credstore.DecryptionKeyId;
 import com.sap.security.dataencryption.credstore.EncryptionKeyId;
@@ -34,15 +34,13 @@ public class EncryptionController {
     DataEncryptionKeyProvider[] dataEncryptionKeyProviders;
     DataEncryption dataEncryption = new DataEncryption();
 
-    @PostMapping("/encryptMesage")
+    @PostMapping("/decryptMessage")
     public String encryptMessage(@RequestParam(name = "tenantId") final String tenantId, @RequestBody final EncryptionData text) {
-        System.out.println("Start --  : " + text.getMessage());
         KeyCache<EncryptionKeyId, DecryptionKeyId> keyCache = new DefaultKeyCache<>(encryptionKeysMaxCapacity, decryptionKeysMaxCapacity,
                 encryptionKeyExpiryInSec, decryptionKeyExpiryInSec);
         CredentialStoreInstance credentialStore = CredentialStoreFactory.getInstance(EnvCoordinates.DEFAULT_ENVIRONMENT);
 
         CredentialStoreNamespaceInstance namespace = credentialStore.getNamespaceInstance(tenantId);
-        System.out.println("Namespace : " + text.getMessage());
         KeyringGenerateOptions keyringGenerateOptions = KeyringGenerateOptions.builder().length(32).subaccountId(tenantId).build();
 
         EnvelopeEncryptionKeyProviderOptions envelopeEncryptionKeyProviderOptions = EnvelopeEncryptionKeyProviderOptions
@@ -51,20 +49,19 @@ public class EncryptionController {
 
         this.credentialStoreKeyProvider = new EnvelopeEncryptionKeyProvider(envelopeEncryptionKeyProviderOptions);
 
-        System.out.println("Key Provider -- : " + text.getMessage());
-
         StringBuilder builder = new StringBuilder();
         byte[] plainData = text.getMessage().getBytes();
-        System.out.println("Message : " + text.getMessage());
-        EncryptDataResult encryptDataResult = null;
+
+        this.dataEncryptionKeyProviders = new DataEncryptionKeyProvider[] { credentialStoreKeyProvider };
+        DecryptDataResult decryptDataResult;
         try {
-            encryptDataResult = this.dataEncryption.encryptData(plainData, this.credentialStoreKeyProvider);
-            byte[] encryptedData = encryptDataResult.getEncryptedData();
-            builder.append(encryptedData).append("\n");
+            decryptDataResult = this.dataEncryption.decryptData(plainData, this.dataEncryptionKeyProviders);
+            byte[] decryptedData = decryptDataResult.getPlainData();
+            builder.append("===== Decrypted =====\n");
+            builder.append(new String(decryptedData));
+            builder.append("===== Decrypted =====\n");
         } catch (DataEncryptionException e) {
-            System.out.println("---------EXCEPTION----------------");
-            System.out.println(e.getMessage());
-            System.out.println("---------EXCEPTION----------------");
+            return e.getMessage();
         }
         return builder.toString();
     }

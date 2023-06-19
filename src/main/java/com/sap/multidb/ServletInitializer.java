@@ -40,7 +40,7 @@ public class ServletInitializer implements ServletContextListener {
         dynamic.addMapping("/employee");
         dynamic.addMapping("/onboard");
         dynamic.addMapping("/appschema");
-        dynamic.addMapping("/encryptMesage");
+        dynamic.addMapping("/decryptMessage");
         dynamic.setInitParameter("dispatchOptionsRequest", "true");
         dynamic.setLoadOnStartup(1);
 

@@ -8,11 +8,11 @@
 		<version>8.3.0</version>
 	</parent>
 	<groupId>com.sap</groupId>
-	<artifactId>MultiDatabaseTest</artifactId>
+	<artifactId>DecryptData</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>MultiDatabasePoC-1</name>
-	<description>Demo project for Spring Boot</description>
+	<name>DecryptData</name>
+	<description>Decrypt Data using credstore</description>
 	<properties>
 		<java.version>1.8</java.version>
 		<spring.version>5.3.19</spring.version>
